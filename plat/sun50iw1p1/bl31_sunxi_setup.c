@@ -132,13 +132,8 @@ entry_point_info_t *bl31_plat_get_next_image_ep_info(uint32_t type)
 void bl31_early_platform_setup(bl31_params_t *from_bl2,
 				void *plat_params_from_bl2)
 {
-
-
 	/* Initialize the console to provide early debug support */
 	console_init(SUNXI_UART0_BASE, UART0_CLK_IN_HZ, UART0_BAUDRATE);
-
-	/* Initialize the platform config for future decision making */
-	sunxi_config_setup();
 
 #if 0
 #if RESET_TO_BL31

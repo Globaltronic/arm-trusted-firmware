@@ -85,19 +85,6 @@ void sunxi_configure_mmu_el3(unsigned long total_base, unsigned long total_size,
 	enable_mmu_el3(0);
 }
 
-/*******************************************************************************
- * A single boot loader stack is expected to work on both the Foundation FVP
- * models and the two flavours of the Base FVP models (AEMv8 & Cortex). The
- * SYS_ID register provides a mechanism for detecting the differences between
- * these platforms. This information is stored in a per-BL array to allow the
- * code to take the correct path.Per BL platform configuration.
- ******************************************************************************/
-int sunxi_config_setup(void)
-{
-
-	return 0;
-}
-
 unsigned long plat_get_ns_image_entrypoint(void)
 {
 	return NS_IMAGE_OFFSET;
