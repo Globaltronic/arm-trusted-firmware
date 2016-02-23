@@ -46,15 +46,17 @@ func platform_mem_init
 	ret
 
 func platform_smp_init
-	mrs	x0, ACTLR_EL3			// Read ACTLR_EL3
-	orr	x0, x0, #(1 << 1)		// Set CPUECTLR_EL1 access control bit
-	msr	ACTLR_EL3, x0			// Write ACTLR_EL3
-	mrs	x0, ACTLR_EL2			// Read ACTLR_EL2
-	orr	x0, x0, #(1 << 1)		// Set CPUECTLR_EL1 access control bit
-	msr	ACTLR_EL2, x0			// Write ACTLR_EL2
-	mrs	x0, S3_1_c15_c2_1		// Read CPUECTLR_EL1
-	orr	x0, x0, #(1 << 6)		// Set the SMPEN bit
-	msr	S3_1_c15_c2_1, x0		// Write CPUECTLR_EL1
+	mrs	x0, ACTLR_EL3
+	orr	x0, x0, #(1 << 1)	// Set CPUECTLR_EL1 access control bit
+	msr	ACTLR_EL3, x0
+
+	mrs	x0, ACTLR_EL2
+	orr	x0, x0, #(1 << 1)	// Set CPUECTLR_EL1 access control bit
+	msr	ACTLR_EL2, x0
+
+	mrs	x0, S3_1_c15_c2_1	// Read CPUECTLR_EL1
+	orr	x0, x0, #(1 << 6)	// Set the SMPEN bit
+	msr	S3_1_c15_c2_1, x0	// Write CPUECTLR_EL1
 	mov	x0, #0x0
 	msr	cntvoff_el2, x0
 	ret
