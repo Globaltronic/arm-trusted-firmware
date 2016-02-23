@@ -95,31 +95,49 @@ uint64_t plat_get_syscnt_freq(void)
 	return 24 * 1000 * 1000;
 }
 
+static unsigned int get_highest_el(int aarch)
+{
+	unsigned int el_status;
+
+	/* Figure out whether we have the HYP/EL2 mode implemented */
+	if (aarch == 32) {
+		el_status = (read_id_pfr1_el1() >> ID_PFR1_VIRTEXT_SHIFT);
+		el_status &= ID_PFR1_VIRTEXT_MASK;
+
+		return el_status ? MODE32_hyp : MODE32_svc;
+	} else if (aarch == 64) {
+		el_status = read_id_aa64pfr0_el1() >> ID_AA64PFR0_EL2_SHIFT;
+		el_status &= ID_AA64PFR0_ELX_MASK;
+
+		return el_status ? MODE_EL2 : MODE_EL1;
+	} else {
+		return -1;
+	}
+}
+
 /*******************************************************************************
  * Gets SPSR for BL33 entry
  ******************************************************************************/
-uint32_t sunxi_get_spsr_for_bl33_entry(void)
+uint32_t sunxi_get_spsr_for_bl33_entry(int aarch)
 {
-	unsigned long el_status;
 	unsigned int mode;
 	uint32_t spsr;
 
-	/* Figure out what mode we enter the non-secure world in */
-	el_status = read_id_aa64pfr0_el1() >> ID_AA64PFR0_EL2_SHIFT;
-	el_status &= ID_AA64PFR0_ELX_MASK;
+	mode = get_highest_el(aarch);
 
-	if (el_status)
-		mode = MODE_EL2;
-	else
-		mode = MODE_EL1;
+	switch (aarch) {
+	case 32:
+		/* HACK: keep entering U-Boot in SVC for now */
+		mode = MODE32_svc;
 
-	/*
-	 * TODO: Consider the possibility of specifying the SPSR in
-	 * the FIP ToC and allowing the platform to have a say as
-	 * well.
-	 */
-	spsr = SPSR_64(mode, MODE_SP_ELX, DISABLE_ALL_EXCEPTIONS);
-	spsr = SPSR_MODE32(MODE32_svc, SPSR_T_ARM, SPSR_E_LITTLE,
-			   DISABLE_ALL_EXCEPTIONS);
+		spsr = SPSR_MODE32(mode, SPSR_T_ARM, SPSR_E_LITTLE,
+				   DISABLE_ALL_EXCEPTIONS);
+		break;
+	case 64:
+	default:
+		spsr = SPSR_64(mode, MODE_SP_ELX, DISABLE_ALL_EXCEPTIONS);
+		break;
+	}
+
 	return spsr;
 }

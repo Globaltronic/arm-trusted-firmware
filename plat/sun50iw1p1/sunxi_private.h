@@ -78,7 +78,7 @@ void sunxi_io_setup(void);
 void sunxi_security_setup(void);
 
 /* Gets the SPSR for BL33 entry */
-uint32_t sunxi_get_spsr_for_bl33_entry(void);
+uint32_t sunxi_get_spsr_for_bl33_entry(int aarch);
 
 
 #endif /* __SUNXI_PRIVATE_H__ */

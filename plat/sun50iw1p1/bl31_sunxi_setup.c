@@ -155,7 +155,7 @@ void bl31_early_platform_setup(bl31_params_t *from_bl2,
 	 * is located and the entry state information
 	 */
 	bl33_image_ep_info.pc = plat_get_ns_image_entrypoint();
-	bl33_image_ep_info.spsr = sunxi_get_spsr_for_bl33_entry();
+	bl33_image_ep_info.spsr = sunxi_get_spsr_for_bl33_entry(32);
 	SET_SECURITY_STATE(bl33_image_ep_info.h.attr, NON_SECURE);
 
 #else
@@ -183,7 +183,7 @@ void bl31_early_platform_setup(bl31_params_t *from_bl2,
 	 * is located and the entry state information
 	 */
 	bl33_image_ep_info.pc = plat_get_ns_image_entrypoint();
-	bl33_image_ep_info.spsr = sunxi_get_spsr_for_bl33_entry();
+	bl33_image_ep_info.spsr = sunxi_get_spsr_for_bl33_entry(32);
 	SET_SECURITY_STATE(bl33_image_ep_info.h.attr, NON_SECURE);
 
 
