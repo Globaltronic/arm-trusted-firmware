@@ -32,7 +32,6 @@
 #include <arch_helpers.h>
 #include <arm_gic.h>
 #include <bl_common.h>
-#include <cci400.h>
 #include <debug.h>
 #include <mmio.h>
 #include <platform.h>
@@ -167,18 +166,6 @@ unsigned long plat_get_ns_image_entrypoint(void)
 uint64_t plat_get_syscnt_freq(void)
 {
 	return 24 * 1000 * 1000;
-}
-
-/*******************************************************************************
- * Gets SPSR for BL32 entry
- ******************************************************************************/
-uint32_t sunxi_get_spsr_for_bl32_entry(void)
-{
-	/*
-	 * The Secure Payload Dispatcher service is responsible for
-	 * setting the SPSR prior to entry into the BL32 image.
-	 */
-	return 0;
 }
 
 /*******************************************************************************

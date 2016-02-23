@@ -73,7 +73,6 @@ extern unsigned long __COHERENT_RAM_END__;
 
 #if 0
 #if RESET_TO_BL31
-static entry_point_info_t bl32_image_ep_info;
 static entry_point_info_t bl33_image_ep_info;
 #else
 /*******************************************************************************
@@ -83,7 +82,6 @@ static entry_point_info_t bl33_image_ep_info;
 static bl31_params_t *bl2_to_bl31_params;
 #endif
 #else
-static entry_point_info_t bl32_image_ep_info;
 static entry_point_info_t bl33_image_ep_info;
 #endif
 
@@ -100,11 +98,9 @@ entry_point_info_t *bl31_plat_get_next_image_ep_info(uint32_t type)
 #if 1
 
 	assert(sec_state_is_valid(type));
+	assert(type == NON_SECURE);
 
-	if (type == NON_SECURE)
-		return &bl33_image_ep_info;
-	else
-		return &bl32_image_ep_info;
+	return &bl33_image_ep_info;
 #else
 	entry_point_info_t *next_image_info;
 
@@ -158,19 +154,7 @@ void bl31_early_platform_setup(bl31_params_t *from_bl2,
 	 */
 	sunxi_security_setup();
 
-	/* Populate entry point information for BL3-2 and BL3-3 */
-	SET_PARAM_HEAD(&bl32_image_ep_info,
-				PARAM_EP,
-				VERSION_1,
-				0);
-	SET_SECURITY_STATE(bl32_image_ep_info.h.attr, SECURE);
-	bl32_image_ep_info.pc = BL32_BASE;
-	bl32_image_ep_info.spsr = sunxi_get_spsr_for_bl32_entry();
-
-	SET_PARAM_HEAD(&bl33_image_ep_info,
-				PARAM_EP,
-				VERSION_1,
-				0);
+	SET_PARAM_HEAD(&bl33_image_ep_info, PARAM_EP, VERSION_1, 0);
 	/*
 	 * Tell BL31 where the non-trusted software image
 	 * is located and the entry state information

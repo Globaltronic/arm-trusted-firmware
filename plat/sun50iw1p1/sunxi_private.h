@@ -47,21 +47,6 @@ typedef volatile struct mailbox {
 } mailbox_t;
 
 /*******************************************************************************
- * This structure represents the superset of information that is passed to
- * BL31 e.g. while passing control to it from BL2 which is bl31_params
- * and bl31_plat_params and its elements
- ******************************************************************************/
-typedef struct bl2_to_bl31_params_mem {
-	bl31_params_t bl31_params;
-	image_info_t bl31_image_info;
-	image_info_t bl32_image_info;
-	image_info_t bl33_image_info;
-	entry_point_info_t bl33_ep_info;
-	entry_point_info_t bl32_ep_info;
-	entry_point_info_t bl31_ep_info;
-} bl2_to_bl31_params_mem_t;
-
-/*******************************************************************************
  * Forward declarations
  ******************************************************************************/
 struct meminfo;
@@ -92,11 +77,8 @@ void sunxi_io_setup(void);
 /* Declarations for sunxi_security.c */
 void sunxi_security_setup(void);
 
-/* Gets the SPR for BL32 entry */
-uint32_t sunxi_get_spsr_for_bl32_entry(void);
-
 /* Gets the SPSR for BL33 entry */
 uint32_t sunxi_get_spsr_for_bl33_entry(void);
 
 
-#endif /* __FVP_PRIVATE_H__ */
+#endif /* __SUNXI_PRIVATE_H__ */

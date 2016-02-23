@@ -50,26 +50,14 @@
 /* Size of cacheable stacks */
 #if DEBUG_XLAT_TABLE
 #define PLATFORM_STACK_SIZE 0x800
-#elif IMAGE_BL1
-#define PLATFORM_STACK_SIZE 0x440
-#elif IMAGE_BL2
-#define PLATFORM_STACK_SIZE 0x400
 #elif IMAGE_BL31
 #define PLATFORM_STACK_SIZE 0x400
-#elif IMAGE_BL32
-#define PLATFORM_STACK_SIZE 0x440
 #endif
 
 #define FIRMWARE_WELCOME_STR		"Booting Trusted Firmware\n"
 
-/* Trusted Boot Firmware BL2 */
-#define BL2_IMAGE_NAME			"bl2.bin"
-
 /* EL3 Runtime Firmware BL31 */
 #define BL31_IMAGE_NAME			"bl31.bin"
-
-/* Secure Payload BL32 (Trusted OS) */
-#define BL32_IMAGE_NAME			"bl32.bin"
 
 /* Non-Trusted Firmware BL33 */
 #define BL33_IMAGE_NAME			"bl33.bin" /* e.g. UEFI */
@@ -103,8 +91,6 @@
 
 #define TSP_SEC_MEM_BASE		SUNXI_TRUSTED_DRAM_BASE
 #define TSP_SEC_MEM_SIZE		SUNXI_TRUSTED_DRAM_SIZE
-#define BL32_BASE			(SUNXI_TRUSTED_DRAM_BASE + SUNXI_SHARED_RAM_SIZE)
-#define BL32_LIMIT			(SUNXI_TRUSTED_DRAM_BASE + (1 << 21))
 
 
 /*
@@ -130,6 +116,5 @@
  ******************************************************************************/
 #define CACHE_WRITEBACK_SHIFT   6
 #define CACHE_WRITEBACK_GRANULE (1 << CACHE_WRITEBACK_SHIFT)
-
 
 #endif /* __PLATFORM_DEF_H__ */
