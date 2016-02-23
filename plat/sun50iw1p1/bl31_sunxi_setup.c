@@ -217,18 +217,11 @@ void bl31_early_platform_setup(bl31_params_t *from_bl2,
  ******************************************************************************/
 void bl31_platform_setup(void)
 {
-
-	//unsigned int reg_val;
-
 	/* Initialize the gic cpu and distributor interfaces */
 	gic_setup();
 
-	/* Intialize the power controller */
-	//sunxi_pwrc_setup();
-
-	/* Topologies are best known to the platform. */
-	sunxi_setup_topology();
-
+	/* Detect if this SoC is a multi-cluster one. */
+	plat_setup_topology();
 }
 
 /*******************************************************************************
