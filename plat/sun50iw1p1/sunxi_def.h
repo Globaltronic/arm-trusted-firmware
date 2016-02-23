@@ -73,22 +73,8 @@
 #define SUNXI_TRUSTED_MONITOR_BASE	0x00044000	/* 16KB into SRAM A2 */
 #define SUNXI_TRUSTED_MONITOR_SIZE	(64 << 10)	/* 64 KByte */
 
-//sec os area
-#define SUNXI_TRUSTED_DRAM_BASE	0x40200000
-#define SUNXI_TRUSTED_DRAM_SIZE	(14<<20)       //14 MB
-
-//monitor area + sec os area
-#define SUNXI_TRUSTED_RAM_SIZE  0x01000000        //total 16M
-
 //atf code limit
 #define SUNXI_TRUSTED_MONITOR_LIMIT	(SUNXI_TRUSTED_MONITOR_BASE + SUNXI_TRUSTED_MONITOR_SIZE)
-
-
-/* 4KB shared memory */
-#define SUNXI_SHARED_RAM_SIZE	0x1000
-
-/* Shared memory at the base of Trusted DRAM */
-#define SUNXI_SHARED_RAM_BASE		SUNXI_TRUSTED_DRAM_BASE
 
 
 #define DRAM1_BASE		0x40000000ull
@@ -98,9 +84,6 @@
 
 #define DRAM_BASE		DRAM1_BASE
 #define DRAM_SIZE		DRAM1_SIZE
-
-#define MEMRES_BASE             SUNXI_TRUSTED_MONITOR_LIMIT //0x40100000
-#define MEMRES_SIZE             0x100000 //1M
 
 /* Load address of BL33 in the sunxi */
 #define NS_IMAGE_OFFSET		(DRAM1_BASE + 0xA000000) /* DRAM + 160MB */
@@ -115,23 +98,5 @@
 #define UART0_BAUDRATE  115200
 
 #define UART0_CLK_IN_HZ 24000000
-
-/*******************************************************************************
- *  Shared Data
- ******************************************************************************/
-
-/* Entrypoint mailboxes */
-#define TRUSTED_MAILBOXES_BASE		SUNXI_SHARED_RAM_BASE
-#define TRUSTED_MAILBOXES_SIZE		0x200
-#define TRUSTED_MAILBOX_SHIFT 		4
-
-
-/* Base address where parameters to BL31 are stored */
-#define PARAMS_BASE		(TRUSTED_MAILBOXES_BASE + TRUSTED_MAILBOXES_SIZE)
-
-#define MHU_SECURE_BASE         0x10000
-#define MHU_SECURE_SIZE         0x1000
-
-#define MHU_PAYLOAD_CACHED    0
 
 #endif /* __SUNXI_DEF_H__ */
