@@ -216,13 +216,11 @@ void bl31_plat_arch_setup(void)
 {
 	//set smp bit before cache enable
 	platform_smp_init();
-#if 1
-	sunxi_configure_mmu_el3(BL31_RO_BASE,
-			      (BL31_COHERENT_RAM_LIMIT - BL31_RO_BASE),
-			      BL31_RO_BASE,
-			      BL31_RO_LIMIT,
-			      BL31_COHERENT_RAM_BASE,
-			      BL31_COHERENT_RAM_LIMIT);
-#endif
 
+	sunxi_configure_mmu_el3(BL31_RO_BASE,
+				(BL31_COHERENT_RAM_LIMIT - BL31_RO_BASE),
+				BL31_RO_BASE,
+				BL31_RO_LIMIT,
+				BL31_COHERENT_RAM_BASE,
+				BL31_COHERENT_RAM_LIMIT);
 }
