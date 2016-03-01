@@ -1,22 +1,20 @@
 #ifndef _UART_H_
 #define _UART_H_
 
-#define NULL ((void*)0)
 #define CCM_UART_PORT_OFFSET          16
 #define CCM_UART_ADDR_OFFSET          0x400
 
-typedef struct serial_hw
-{
-	volatile unsigned int rbr;		/* 0 */
-	volatile unsigned int ier;		/* 1 */
-	volatile unsigned int fcr;		/* 2 */
-	volatile unsigned int lcr;		/* 3 */
-	volatile unsigned int mcr;		/* 4 */
-	volatile unsigned int lsr;		/* 5 */
-	volatile unsigned int msr;		/* 6 */
-	volatile unsigned int sch;		/* 7 */
-}serial_hw_t;
-
+#define DW_UART_RBR	0x00
+#define DW_UART_THR	0x00
+#define DW_UART_DLL	0x00
+#define DW_UART_IER	0x04
+#define DW_UART_DLH	0x04
+#define DW_UART_FCR	0x08
+#define DW_UART_LCR	0x0c
+#define DW_UART_MCR	0x10
+#define DW_UART_LSR	0x14
+#define DW_UART_MSR	0x18
+#define DW_UART_SCH	0x1c
 
 #define   UART_BAUD    115200      // Baud rate for UART
                                    // Compute the divisor factor
@@ -26,13 +24,13 @@ typedef struct serial_hw
 #define   DLEN         3           // Data Length: 0 - 5bits; 1 - 6bits; 2 - 7bits; 3 - 8bits
 
 #if DEBUG
-void sunxi_serial_init(int uart_port, void *gpio_cfg, int gpio_max);
+void sunxi_serial_init(int uart_port);
 void sunxi_serial_exit(void);
 void sunxi_serial_putc (char c);
 char sunxi_serial_getc (void);
 int sunxi_serial_tstc (void);
 #else
-static inline void sunxi_serial_init(int uart_port, void *gpio_cfg, int gpio_max) {}
+static inline void sunxi_serial_init(int uart_port) {}
 static inline void sunxi_serial_exit(void) {}
 static inline void sunxi_serial_putc(char c) {}
 static inline char sunxi_serial_getc(void) { return 0;}

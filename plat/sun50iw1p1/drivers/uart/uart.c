@@ -33,100 +33,90 @@
 #include <uart.h>
 #include <gpio.h>
 #include <ccmu.h>
+
 #if DEBUG
-#define thr rbr
-#define dll rbr
-#define dlh ier
-#define iir fcr
 
-static serial_hw_t *serial_ctrl_base = NULL;
-static uint32_t uart_lock = 1;
-#if 0
-normal_gpio_set_t uart_ctrl[2] =
-{
-	{ 2, 8, 4, 1, 1, 0, {0}},//PB8: 4--RX
-	{ 2, 9, 4, 1, 1, 0, {0}},//PB9: 4--TX
-};
-#endif
+uintptr_t serial_ctrl_base;
+int uart_locked = 1;
 
-void sunxi_serial_init(int uart_port, void *gpio_cfg, int gpio_max)
+void sunxi_serial_init(int uart_port)
 {
-	uint32_t reg, i;
+	uint32_t reg;
 	uint32_t uart_clk;
 
-	if( (uart_port < 0) ||(uart_port > 0) )
-	{
-		return ;
-	}
-	//reset
+	/* assert the UART port's reset line */
 	reg = mmio_read_32(CCMU_BUS_SOFT_RST_REG4);
-	reg &= ~(1<<(CCM_UART_PORT_OFFSET + uart_port));
-	mmio_write_32(CCMU_BUS_SOFT_RST_REG4,reg);
-	for( i = 0; i < 100; i++ );
-	reg |=  (1<<(CCM_UART_PORT_OFFSET + uart_port));
-	mmio_write_32(CCMU_BUS_SOFT_RST_REG4,reg);
-	//gate
-	reg = mmio_read_32(CCMU_BUS_CLK_GATING_REG3);
-	reg &= ~(1<<(CCM_UART_PORT_OFFSET + uart_port));
-	mmio_write_32(CCMU_BUS_CLK_GATING_REG3,reg);
-	for( i = 0; i < 100; i++ );
-	reg |=  (1<<(CCM_UART_PORT_OFFSET + uart_port));
-	mmio_write_32(CCMU_BUS_CLK_GATING_REG3,reg);
+	reg &= ~(1 << (CCM_UART_PORT_OFFSET + uart_port));
+	mmio_write_32(CCMU_BUS_SOFT_RST_REG4, reg);
 
-	//gpio
-	//boot_set_gpio(gpio_cfg, gpio_max, 1);  //boot set,so not need to set again
-	//uart init
-	serial_ctrl_base = (serial_hw_t *)(SUNXI_UART0_BASE + uart_port * CCM_UART_ADDR_OFFSET);
-	serial_ctrl_base->mcr = 0x3;
-	uart_clk = (24000000 + 8 * UART_BAUD)/(16 * UART_BAUD);
-	serial_ctrl_base->lcr |= 0x80;
-	serial_ctrl_base->dlh = uart_clk>>8;
-	serial_ctrl_base->dll = uart_clk&0xff;
-	serial_ctrl_base->lcr &= ~0x80;
-	serial_ctrl_base->lcr = ((PARITY&0x03)<<3) | ((STOP&0x01)<<2) | (DLEN&0x03);
-	serial_ctrl_base->fcr = 0x7;
+	/* release the clock gate */
+	reg = mmio_read_32(CCMU_BUS_CLK_GATING_REG3);
+	reg |=  (1 << (CCM_UART_PORT_OFFSET + uart_port));
+	mmio_write_32(CCMU_BUS_CLK_GATING_REG3, reg);
+
+	/* de-assert the UART port's reset line */
+	reg = mmio_read_32(CCMU_BUS_SOFT_RST_REG4);
+	reg |=  (1 << (CCM_UART_PORT_OFFSET + uart_port));
+	mmio_write_32(CCMU_BUS_SOFT_RST_REG4, reg);
+
+
+	/* The GPIO pins are already configured */
+	serial_ctrl_base = SUNXI_UART0_BASE + uart_port * CCM_UART_ADDR_OFFSET;
+
+	mmio_write_32(serial_ctrl_base + DW_UART_MCR, 0x3);
+	uart_clk = (24000000 + 8 * UART_BAUD) / (16 * UART_BAUD);
+	mmio_write_32(serial_ctrl_base + DW_UART_LCR,
+		      mmio_read_32(serial_ctrl_base + DW_UART_LCR) | 0x80);
+
+	mmio_write_32(serial_ctrl_base + DW_UART_DLH, uart_clk >> 8);
+	mmio_write_32(serial_ctrl_base + DW_UART_DLL, uart_clk & 0xff);
+	mmio_write_32(serial_ctrl_base + DW_UART_LCR,
+		      mmio_read_32(serial_ctrl_base + DW_UART_LCR) & ~0x80);
+	mmio_write_32(serial_ctrl_base + DW_UART_LCR,
+		      (PARITY << 3) | (STOP << 2) | DLEN);
+	mmio_write_32(serial_ctrl_base + DW_UART_FCR, 0x7);
  
-	uart_lock = 0;
+	uart_locked = 0;
 
 	return;
 }
 
-
 void sunxi_serial_exit(void)
 {
-	uart_lock = 1;
+	uart_locked = 1;
 }
 
 void sunxi_serial_putc (char c)
 {
-	if (uart_lock)
+	if (uart_locked)
 		return;
 
-	while((serial_ctrl_base->lsr & ( 1 << 6 )) == 0);
-	serial_ctrl_base->thr = c;
+	while (!(mmio_read_32(serial_ctrl_base + DW_UART_LSR) & 0x40))
+		;
+	mmio_write_32(serial_ctrl_base + DW_UART_THR, c);
 }
 
 
 char sunxi_serial_getc (void)
 {
-	if (uart_lock)
+	if (uart_locked)
 		return 0;
 
-	while((serial_ctrl_base->lsr & 1) == 0);
-	return serial_ctrl_base->rbr;
-
+	while (!(mmio_read_32(serial_ctrl_base + DW_UART_LSR) & 0x01))
+		;
+	return mmio_read_32(serial_ctrl_base + DW_UART_RBR);
 }
 
 int sunxi_serial_tstc (void)
 {
-	return serial_ctrl_base->lsr & 1;
+	return mmio_read_32(serial_ctrl_base + DW_UART_LSR) & 0x01;
 }
 #endif /* DEBUG */
 
 int console_init(unsigned long base_addr,
 		unsigned int uart_clk, unsigned int baud_rate)
 {
-	sunxi_serial_init(0,NULL,0);
+	sunxi_serial_init(0);
 	return 0;
 }
 
@@ -146,4 +136,3 @@ int console_getc(void)
 {
 	return sunxi_serial_getc();
 }
-
