@@ -50,11 +50,6 @@
 bakery_lock_t plat_console_lock __attribute__ ((section("tzfw_coherent_mem")));
 
 /*******************************************************************************
- * Private Sunxi function to program the mailbox for a cpu before it is released
- * from reset.
- ******************************************************************************/
-
-/*******************************************************************************
  * Private Sunxi function which is used to determine if any platform actions
  * should be performed for the specified affinity instance given its
  * state. Nothing needs to be done if the 'state' is not off or if this is not
@@ -92,16 +87,15 @@ int32_t sunxi_affinst_on(uint64_t mpidr,
 			uint32_t afflvl,
 			uint32_t state)
 {
-	/*
-	 * SCP takes care of powering up higher affinity levels so we
-	 * only need to care about level 0
-	 */
+	int cpu_nr = (mpidr >> MPIDR_AFF0_SHIFT) & MPIDR_AFFLVL_MASK;
+	int cluster_nr = (mpidr >> MPIDR_AFF1_SHIFT) & MPIDR_AFFLVL_MASK;
+
 	if (afflvl != MPIDR_AFFLVL0)
 		return PSCI_E_SUCCESS;
 
-	//INFO("mpidr:0x%llx, sec_entrypoint:0x%lx, ns_entrypoint:0x%lx, afflvl:0x%x, state:0x%x\n",
-		//mpidr, sec_entrypoint, ns_entrypoint, afflvl, state);
-	arisc_cpu_op(mpidr&0xff, sec_entrypoint, arisc_power_on, arisc_power_on);
+	sun50i_set_secondary_entry(sec_entrypoint, cpu_nr);
+
+	sun50i_cpu_power_up(cluster_nr, cpu_nr);
 
 	return PSCI_E_SUCCESS;
 }
@@ -135,38 +129,37 @@ int32_t sunxi_affinst_on_finish(uint64_t mpidr, uint32_t afflvl, uint32_t state)
 int sunxi_affinst_standby(unsigned int power_state)
 {
 	unsigned int target_afflvl;
-        uint64_t scr = 0;
+	uint64_t scr = 0;
 
-    	/* Sanity check the requested state */
-    	target_afflvl = psci_get_pstate_afflvl(power_state);
-
-    	/*
-    	 *          * It's possible to enter standby only on affinity level 0 i.e. a cpu
-    	 *                   * on the FVP. Ignore any other affinity level.
-    	 *                            */
-    	if (target_afflvl != MPIDR_AFFLVL0)
-    	    return PSCI_E_INVALID_PARAMS;
-
-    	scr = read_scr_el3();
-    	/* enable physical IRQ bit for NS world to wakeup the CPU */
-    	write_scr_el3(scr | SCR_IRQ_BIT);
-    	isb();
+	/* Sanity check the requested state */
+	target_afflvl = psci_get_pstate_afflvl(power_state);
 
     	/*
-    	 *          * Enter standby state
-    	 *                   * dsb is good practice before using wfi to enter low power states
-    	 *                            */
-    	dsb();
-    	wfi();
+	 * It's possible to enter standby only on affinity level 0 i.e. a core.
+	 * Ignore any other affinity level.
+	 */
+	if (target_afflvl != MPIDR_AFFLVL0)
+		return PSCI_E_INVALID_PARAMS;
+
+	scr = read_scr_el3();
+	/* enable physical IRQ bit for NS world to wakeup the CPU */
+	write_scr_el3(scr | SCR_IRQ_BIT);
+	isb();
 
     	/*
-    	 *          * Restore SCR to the original value, sync of scr_el3 is done
-    	 *                   * by eret while el3_exit to save some execution cycles.
-    	 *                            * */
-    	write_scr_el3(scr);
+	 * Enter standby state
+	 * dsb is good practice before using wfi to enter low power states
+	 */
+	dsb();
+	wfi();
 
-    	return PSCI_E_SUCCESS;
+    	/*
+	 * Restore SCR to the original value, sync of scr_el3 is done
+	 * by eret while el3_exit to save some execution cycles.
+	 */
+	write_scr_el3(scr);
 
+	return PSCI_E_SUCCESS;
 }
 
 /*******************************************************************************
@@ -175,22 +168,16 @@ int sunxi_affinst_standby(unsigned int power_state)
  * the highest affinity level which will be powered down. It performs the
  * actions common to the OFF and SUSPEND calls.
  ******************************************************************************/
-static int32_t sunxi_power_down_common(uint32_t afflvl, uint64_t mpidr, uint64_t sec_entrypoint)
+static int32_t sunxi_power_down_common(uint32_t afflvl, uint64_t mpidr,
+				       uint64_t sec_entrypoint)
 {
-	uint32_t cluster_state = arisc_power_on;
+	int cpu_nr = (mpidr >> MPIDR_AFF0_SHIFT) & MPIDR_AFFLVL_MASK;
+	int cluster_nr = (mpidr >> MPIDR_AFF1_SHIFT) & MPIDR_AFFLVL_MASK;
 
 	/* Prevent interrupts from spuriously waking up this cpu */
 	arm_gic_cpuif_deactivate();
 
-	/* Cluster is to be turned off, so disable coherency */
-	if (afflvl > MPIDR_AFFLVL0) {
-		//cci_disable_cluster_coherency(read_mpidr_el1());
-		cluster_state = arisc_power_off;
-	}
-
-	//INFO("afflvl:0x%x, mpidr:0x%lx, sec_entrypoint: %lx\n",
-		//afflvl, mpidr, sec_entrypoint);
-	arisc_cpu_op(mpidr&0xff, sec_entrypoint, scpi_power_off, cluster_state);
+	sun50i_cpu_power_down(cluster_nr, cpu_nr);
 
 	return PSCI_E_SUCCESS;
 }
