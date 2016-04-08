@@ -224,7 +224,7 @@ void arm_gic_pcpu_distif_setup(void)
 	assert(g_gicd_base);
 	gicd_write_igroupr(g_gicd_base, 0, ~0);
 
-	assert(g_irq_sec_ptr);
+	assert(!g_num_irqs || g_irq_sec_ptr);
 	for (index = 0; index < g_num_irqs; index++) {
 		irq_num = g_irq_sec_ptr[index];
 		if (irq_num < MIN_SPI_ID) {
@@ -264,7 +264,7 @@ static void arm_gic_distif_setup(void)
 		gicd_write_igroupr(g_gicd_base, index << IGROUPR_SHIFT, ~0);
 
 	/* Configure secure interrupts now */
-	assert(g_irq_sec_ptr);
+	assert(!g_num_irqs || g_irq_sec_ptr);
 	for (index = 0; index < g_num_irqs; index++) {
 		irq_num = g_irq_sec_ptr[index];
 		if (irq_num >= MIN_SPI_ID) {
@@ -296,7 +296,7 @@ void arm_gic_init(unsigned int gicc_base,
 	assert(gicc_base);
 	assert(gicd_base);
 	assert(gicr_base);
-	assert(irq_sec_ptr);
+	assert(!num_irqs || irq_sec_ptr);
 	g_gicc_base = gicc_base;
 	g_gicd_base = gicd_base;
 	g_gicr_base = gicr_base;
