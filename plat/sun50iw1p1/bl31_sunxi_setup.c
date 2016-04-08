@@ -197,7 +197,8 @@ void bl31_early_platform_setup(bl31_params_t *from_bl2,
 void bl31_platform_setup(void)
 {
 	/* Initialize the gic cpu and distributor interfaces */
-	gic_setup();
+	arm_gic_init(GICC_BASE, GICD_BASE, 0, NULL, 0);
+	arm_gic_setup();
 
 	/* Detect if this SoC is a multi-cluster one. */
 	plat_setup_topology();

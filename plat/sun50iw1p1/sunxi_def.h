@@ -47,9 +47,6 @@
 #define GICD_BASE			0x01c81000
 #define GICC_BASE			0x01c82000
 
-#define ARMA9_GIC_BASE  		GICD_BASE
-#define ARMA9_CPUIF_BASE		GICC_BASE
-
 /* Firmware Image Package */
 #define FIP_IMAGE_NAME			"fip.bin"
 #define SUNXI_PRIMARY_CPU			0x0

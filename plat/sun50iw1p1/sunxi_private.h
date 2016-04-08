@@ -34,13 +34,6 @@
 #include <bl_common.h>
 #include <platform_def.h>
 
-
-void gic_cpuif_deactivate(unsigned int gicc_base);
-void gic_cpuif_setup(unsigned int gicc_base);
-void gic_pcpu_distif_setup(unsigned int gicd_base);
-void gic_setup(void);
-
-
 typedef volatile struct mailbox {
 	unsigned long value
 	__attribute__((__aligned__(CACHE_WRITEBACK_GRANULE)));

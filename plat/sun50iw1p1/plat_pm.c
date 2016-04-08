@@ -30,6 +30,7 @@
 
 #include <assert.h>
 #include <arch_helpers.h>
+#include <arm_gic.h>
 #include <debug.h>
 #include <errno.h>
 #include <platform.h>
@@ -118,24 +119,12 @@ int32_t sunxi_affinst_on_finish(uint64_t mpidr, uint32_t afflvl, uint32_t state)
 	if (sunxi_do_plat_actions(afflvl, state) == -EAGAIN)
 		return PSCI_E_SUCCESS;
 
-
-	/*
-	 * Perform the common cluster specific operations i.e enable coherency
-	 * if this cluster was off.
-	 */
-	if (afflvl != MPIDR_AFFLVL0)
-	{
-		//cci_enable_cluster_coherency(mpidr);
-	}
-
 	// set smp bit before cache enable
 	platform_smp_init();
 
 	/* Enable the gic cpu interface */
-	gic_cpuif_setup(GICC_BASE);
-
-	/* Sunxi todo: Is this setup only needed after a cold boot? */
-	gic_pcpu_distif_setup(GICD_BASE);
+	arm_gic_cpuif_setup();
+	arm_gic_pcpu_distif_setup();
 
 	return PSCI_E_SUCCESS;
 }
@@ -191,7 +180,7 @@ static int32_t sunxi_power_down_common(uint32_t afflvl, uint64_t mpidr, uint64_t
 	uint32_t cluster_state = arisc_power_on;
 
 	/* Prevent interrupts from spuriously waking up this cpu */
-	gic_cpuif_deactivate(GICC_BASE);
+	arm_gic_cpuif_deactivate();
 
 	/* Cluster is to be turned off, so disable coherency */
 	if (afflvl > MPIDR_AFFLVL0) {
@@ -266,7 +255,8 @@ static int32_t sunxi_affinst_suspend_finish(uint64_t mpidr,
 					   uint32_t state)
 {
 	if ((afflvl == psci_get_suspend_afflvl()) && ((mpidr & 0xff) == 0x0)) {
-		gic_setup();
+		arm_gic_init(GICC_BASE, GICD_BASE, 0, NULL, 0);
+		arm_gic_setup();
 		console_init(SUNXI_UART0_BASE, UART0_CLK_IN_HZ, UART0_BAUDRATE);
 		arisc_cpux_ready_notify();
 

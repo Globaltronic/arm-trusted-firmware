@@ -40,16 +40,11 @@
 #include <platform.h>
 #include <stdint.h>
 
-
 static unsigned int g_gicc_base;
 static unsigned int g_gicd_base;
 static unsigned long g_gicr_base;
 static const unsigned int *g_irq_sec_ptr;
 static unsigned int g_num_irqs;
-
-void gic_sunxi_distributor_init(void);
-void gic_sunxi_cpuif_init(void);
-
 
 /*******************************************************************************
  * This function does some minimal GICv3 configuration. The Firmware itself does
@@ -164,7 +159,6 @@ static void gicv3_cpuif_deactivate(void)
  ******************************************************************************/
 void arm_gic_cpuif_setup(void)
 {
-
 	unsigned int val;
 
 	assert(g_gicc_base);
@@ -184,7 +178,6 @@ void arm_gic_cpuif_setup(void)
 
 	gicc_write_pmr(g_gicc_base, GIC_PRI_MASK);
 	gicc_write_ctlr(g_gicc_base, val);
-
 }
 
 /*******************************************************************************
@@ -280,7 +273,6 @@ static void arm_gic_distif_setup(void)
 	arm_gic_pcpu_distif_setup();
 
 	gicd_write_ctlr(g_gicd_base, ctlr | ENABLE_GRP0);
-
 }
 
 /*******************************************************************************
@@ -308,16 +300,8 @@ void arm_gic_init(unsigned int gicc_base,
 ******************************************************************************/
 void arm_gic_setup(void)
 {
-	if(0)
-	{
-		arm_gic_cpuif_setup();
-		arm_gic_distif_setup();
-	}else
-	{
-		gic_sunxi_cpuif_init();
-		gic_sunxi_distributor_init();
-	}
-
+	arm_gic_cpuif_setup();
+	arm_gic_distif_setup();
 }
 
 /*******************************************************************************
