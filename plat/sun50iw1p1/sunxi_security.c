@@ -36,41 +36,9 @@
 #include "sunxi_def.h"
 #include "sunxi_private.h"
 
-#define SPC_BASE (0x1c23400ull)
+#define SPC_BASE	0x1c23400ULL
 
-#define SPC_DECPORT0_STA_REG  (SPC_BASE+0x4)
-#define SPC_DECPORT0_SET_REG  (SPC_BASE+0x8)
-#define SPC_DECPORT0_CLR_REG  (SPC_BASE+0xc)
-
-#define SPC_DECPORT1_STA_REG  (SPC_BASE+0x10)
-#define SPC_DECPORT1_SET_REG  (SPC_BASE+0x14)
-#define SPC_DECPORT1_CLR_REG  (SPC_BASE+0x18)
-
-#define SPC_DECPORT2_STA_REG  (SPC_BASE+0x1c)
-#define SPC_DECPORT2_SET_REG  (SPC_BASE+0x20)
-#define SPC_DECPORT2_CLR_REG  (SPC_BASE+0x24)
-
-#define SPC_DECPORT3_STA_REG  (SPC_BASE+0x28)
-#define SPC_DECPORT3_SET_REG  (SPC_BASE+0x2c)
-#define SPC_DECPORT3_CLR_REG  (SPC_BASE+0x30)
-
-#define SPC_DECPORT4_STA_REG  (SPC_BASE+0x34)
-#define SPC_DECPORT4_SET_REG  (SPC_BASE+0x38)
-#define SPC_DECPORT4_CLR_REG  (SPC_BASE+0x3c)
-
-#define SPC_DECPORT5_STA_REG  (SPC_BASE+0x40)
-#define SPC_DECPORT5_SET_REG  (SPC_BASE+0x44)
-#define SPC_DECPORT5_CLR_REG  (SPC_BASE+0x48)
-
-
-
-
-
-
-
-
-/* Used to improve readability for configuring regions. */
-#define FILTER_SHIFT(filter)	(1 << filter)
+#define SPC_DECPORT_SET_REG(p) (SPC_BASE + ((p) * 0x10) + 0x8)
 
 /*
  * For the moment we assume that all security programming is done by the
@@ -80,31 +48,19 @@
  */
 void sunxi_security_setup(void)
 {
-	/*
-	 *
-	 * If the platform had additional peripheral specific security
-	 * configurations, those would be configured here.
-	 */
+	int i;
 
-	//if (!(get_plat_config()->flags & CONFIG_HAS_TZC))
-	//	return;
+	NOTICE("Configuring SPC Controller\n");
 
-	INFO("Configuring SPC Controller\n");
-	//set all peripherals to non-sec
-	mmio_write_32(SPC_DECPORT0_SET_REG,0xff);
-	mmio_write_32(SPC_DECPORT1_SET_REG,0xff);
-	mmio_write_32(SPC_DECPORT2_SET_REG,0xff);
-	mmio_write_32(SPC_DECPORT3_SET_REG,0xff);
-	mmio_write_32(SPC_DECPORT4_SET_REG,0xff);
-	mmio_write_32(SPC_DECPORT5_SET_REG,0xff);
+	for (i = 0; i < 6; i++)
+		mmio_write_32(SPC_DECPORT_SET_REG(i), 0xff);
 	
-	//set ccmu security switch: set mbus_sec bus_sec pll_sec to non-sec
+	/* set CCMU mbus_sec, bus_sec, pll_sec to non-secure */
 	mmio_write_32(0x01c20000+0x2f0, 0x7);
 
-	//set R_PRCM security switch: set power_sec  pll_sec cpus_clk to non-sec
+	/* set R_PRCM power_sec, pll_sec, cpus_clk to non-secure */
 	mmio_write_32(0x01f01400+0x1d0, 0x7);
 	
-	//set dma security switch: set DMA channel0-7 to non-sec
+	/* Set DMA channels 0-7 to non-secure */
 	mmio_write_32(0x01c02000+0x20, 0xff);
-
 }
