@@ -295,7 +295,6 @@ void arm_gic_init(unsigned int gicc_base,
 {
 	assert(gicc_base);
 	assert(gicd_base);
-	assert(gicr_base);
 	assert(!num_irqs || irq_sec_ptr);
 	g_gicc_base = gicc_base;
 	g_gicd_base = gicd_base;
