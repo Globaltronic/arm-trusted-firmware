@@ -83,22 +83,6 @@
 #define BL31_LIMIT			SUNXI_TRUSTED_MONITOR_LIMIT
 
 /*******************************************************************************
- * BL32 specific defines.
- ******************************************************************************/
-/*
- * On sun50iw1p1, the TSP can execute either from Trusted SRAM or Trusted DRAM.
- */
-
-#define TSP_SEC_MEM_BASE		SUNXI_TRUSTED_DRAM_BASE
-#define TSP_SEC_MEM_SIZE		SUNXI_TRUSTED_DRAM_SIZE
-
-
-/*
- * ID of the secure physical generic timer interrupt used by the TSP.
- */
-#define TSP_IRQ_SEC_PHY_TIMER		IRQ_SEC_PHY_TIMER
-
-/*******************************************************************************
  * Platform specific page table and MMU setup constants
  ******************************************************************************/
 #define ADDR_SPACE_SIZE			(1ull << 32)
