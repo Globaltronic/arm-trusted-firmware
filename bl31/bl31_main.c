@@ -105,9 +105,9 @@ void bl31_main(void)
 	 */
 	if (bl32_init) {
 		INFO("BL3-1: Initializing BL3-2\n");
-		//(*bl32_init)();
+		(*bl32_init)();
 	}
-	//__asm__ __volatile__ ("b .");
+
 	/*
 	 * We are ready to enter the next EL. Prepare entry into the image
 	 * corresponding to the desired security state after the next ERET.
