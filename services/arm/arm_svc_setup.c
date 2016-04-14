@@ -38,7 +38,6 @@
 #include <string.h>
 #include <bl_common.h>
 #include <context_mgmt.h>
-#include <arisc.h>
 #include <mmio.h>
 
 #define ARM_NUM_CALLS 4
@@ -48,12 +47,6 @@
 //0x8000ff02 reserved
 #define ARM_SVC_VERSION		0x8000ff03
 #define ARM_SVC_RUNNSOS		0x8000ff04
-
-#define ARM_SVC_ARISC_STARTUP	 0x8000ff10
-#define ARM_SVC_ARISC_WAIT_READY 0x8000ff11
-#define ARM_SVC_ARISC_READ_PMU   0x8000ff12
-#define ARM_SVC_ARISC_WRITE_PMU  0x8000ff13
-
 
 /* ARM Standard Service Calls version numbers */
 #define ARM_SVC_VERSION_MAJOR		0x0
@@ -122,62 +115,6 @@ uint64_t arm_svc_smc_handler(uint32_t smc_fid,
 		prepare_nonsec_os_entry((uint32_t)x1,(uint32_t)x2);
 		SMC_RET0(handle);
 
-	//arise cmd begin
-	//arise aa32 cmd
-	case ARM_SVC_ARISC_STARTUP:
-		SMC_RET1(handle, sunxi_arisc_probe((void *)x1));
-	case ARM_SVC_ARISC_WAIT_READY:
-		SMC_RET1(handle, sunxi_arisc_wait_ready());
-	case ARM_SVC_ARISC_READ_PMU:
-		SMC_RET1(handle, arisc_rsb_read_pmu_reg((uint32_t)x1));
-	case ARM_SVC_ARISC_WRITE_PMU:
-		SMC_RET1(handle,arisc_rsb_write_pmu_reg((uint32_t)x1,(uint32_t)x2));
-
-	//arise aa64 cmd
-	case ARM_SVC_ARISC_CPUX_DVFS_REQ:
-		SMC_RET1(handle, arisc_dvfs_set_cpufreq((uint32_t)x1, (uint32_t)x2, (uint32_t)x3));
-	case ARM_SVC_ARISC_RSB_READ_BLOCK_DATA:
-		SMC_RET1(handle, arisc_rsb_read_block_data((uint32_t *)x1));
-	case ARM_SVC_ARISC_RSB_WRITE_BLOCK_DATA:
-		SMC_RET1(handle, arisc_rsb_write_block_data((uint32_t *)x1));
-	case ARM_SVC_ARISC_RSB_BITS_OPS_SYNC:
-		SMC_RET1(handle, rsb_bits_ops_sync((uint32_t *)x1));
-	case ARM_SVC_ARISC_RSB_SET_INTERFACE_MODE:
-		SMC_RET1(handle, arisc_rsb_set_interface_mode((uint32_t)x1, (uint32_t)x2, (uint32_t)x3));
-	case ARM_SVC_ARISC_RSB_SET_RTSADDR:
-		SMC_RET1(handle, arisc_rsb_set_rtsaddr((uint32_t)x1, (uint32_t)x2));
-	case ARM_SVC_ARISC_SET_DEBUG_LEVEL:
-		SMC_RET1(handle, arisc_set_debug_level((uint32_t)x1));
-	case ARM_SVC_ARISC_SET_UART_BAUDRATE:
-		SMC_RET1(handle, arisc_set_uart_baudrate((uint32_t)x1));
-	case ARM_SVC_ARISC_MESSAGE_LOOPBACK:
-		SMC_RET1(handle, arisc_message_loopback());
-	case ARM_SVC_ARISC_SET_DEBUG_DRAM_CRC_PARAS:
-		SMC_RET1(handle, arisc_set_dram_crc_paras((uint32_t)x1, (uint32_t)x2, (uint32_t)x3));
-	case ARM_SVC_ARISC_AXP_DISABLE_IRQ:
-		SMC_RET1(handle, arisc_disable_nmi_irq());
-	case ARM_SVC_ARISC_AXP_ENABLE_IRQ:
-		SMC_RET1(handle, arisc_enable_nmi_irq());
-	case ARM_SVC_ARISC_CLR_NMI_STATUS:
-		SMC_RET1(handle, arisc_clear_nmi_status());
-	case ARM_SVC_ARISC_SET_NMI_TRIGGER:
-		SMC_RET1(handle, arisc_set_nmi_trigger((uint32_t)x1));
-	case ARM_SVC_ARISC_AXP_GET_CHIP_ID:
-		SMC_RET1(handle, arisc_axp_get_chip_id((unsigned char *)x1));
-	case ARM_SVC_ARISC_AXP_SET_PARAS:
-		SMC_RET1(handle, arisc_adjust_pmu_chgcur((uint32_t)x1, (uint32_t)x2, (uint32_t)x3));
-	case ARM_SVC_ARISC_SET_PWR_TREE:
-		SMC_RET1(handle, arisc_set_pwr_tree((uint32_t *)x1));
-	case ARM_SVC_ARISC_SET_PMU_VOLT:
-		SMC_RET1(handle, arisc_pmu_set_voltage((uint32_t)x1, (uint32_t)x2));
-	case ARM_SVC_ARISC_GET_PMU_VOLT:
-		SMC_RET1(handle, arisc_pmu_get_voltage((uint32_t)x1, (uint32_t *)x2));
-	case ARM_SVC_ARISC_SET_LED_BLN:
-		SMC_RET1(handle, arisc_set_led_bln((uint32_t *)x1));
-	case ARM_SVC_ARISC_QUERY_WAKEUP_SRC_REQ:
-		SMC_RET1(handle, arisc_query_wakeup_source((uint32_t *)x1));
-	case ARM_SVC_ARISC_STANDBY_INFO_REQ:
-		SMC_RET1(handle, arisc_query_set_standby_info((standby_info_para_t *)x1, (arisc_rw_type_e)x2));
 	default:
 		WARN("Unimplemented Standard Service Call: 0x%x \n", smc_fid);
 		SMC_RET1(handle, SMC_UNK);

@@ -87,4 +87,3 @@ BL31_SOURCES		+=	drivers/arm/gic/arm_gic.c		\
 				plat/sun50iw1p1/aarch64/sunxi_common.c	\
 				services/arm/arm_svc_setup.c	
 
-include plat/${PLAT}/scp/arisc.mk

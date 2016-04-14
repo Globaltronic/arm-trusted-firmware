@@ -41,7 +41,6 @@
 #include "sunxi_def.h"
 #include "sunxi_private.h"
 #include "sunxi_cpu_ops.h"
-#include <arisc.h>
 #include <cci400.h>
 #include <console.h>
 #include <psci.h>
@@ -244,7 +243,6 @@ static int32_t sunxi_affinst_suspend_finish(uint64_t mpidr,
 		arm_gic_init(GICC_BASE, GICD_BASE, 0, NULL, 0);
 		arm_gic_setup();
 		console_init(SUNXI_UART0_BASE, UART0_CLK_IN_HZ, UART0_BAUDRATE);
-		arisc_cpux_ready_notify();
 
 	}
 
