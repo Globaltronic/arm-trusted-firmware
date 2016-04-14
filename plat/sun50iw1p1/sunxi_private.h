@@ -34,11 +34,6 @@
 #include <bl_common.h>
 #include <platform_def.h>
 
-typedef volatile struct mailbox {
-	unsigned long value
-	__attribute__((__aligned__(CACHE_WRITEBACK_GRANULE)));
-} mailbox_t;
-
 /*******************************************************************************
  * Forward declarations
  ******************************************************************************/
