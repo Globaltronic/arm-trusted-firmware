@@ -41,7 +41,15 @@
 #ifndef __SUNXI_DEF_H__
 #define __SUNXI_DEF_H__
 
-#include "sun50iw1p1.h"
+#define SUNXI_CCM_BASE			0x01c20000
+#define SUNXI_PIO_BASE			0x01c20800
+#define SUNXI_UART0_BASE		0x01c28000
+#define GICD_BASE			0x01c81000
+#define GICC_BASE			0x01c82000
+
+#define ARMA9_GIC_BASE  		GICD_BASE
+#define ARMA9_CPUIF_BASE		GICC_BASE
+
 /* Firmware Image Package */
 #define FIP_IMAGE_NAME			"fip.bin"
 #define SUNXI_PRIMARY_CPU			0x0

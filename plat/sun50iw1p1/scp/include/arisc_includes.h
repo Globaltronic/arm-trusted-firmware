@@ -58,7 +58,6 @@
 #include "../../sunxi_def.h"
 #include "../../mhu.h"
 #include "../../scpi.h"
-#include "../../sun50iw1p1.h"
 
 /* configure and debugger */
 #include "../arisc_i.h"
