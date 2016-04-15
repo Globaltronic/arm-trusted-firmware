@@ -72,9 +72,7 @@ PLAT_BL_COMMON_SOURCES	:= lib/aarch64/xlat_tables.c			\
 
 BL31_SOURCES		+=	drivers/arm/cci400/cci400.c \
 				drivers/arm/gic/gic_v2.c			\
-				lib/cpus/aarch64/aem_generic.S			\
 				lib/cpus/aarch64/cortex_a53.S			\
-				lib/cpus/aarch64/cortex_a57.S			\
 				plat/common/aarch64/platform_mp_stack.S		\
 				plat/sun50iw1p1/bl31_sunxi_setup.c			\
 				plat/sun50iw1p1/plat_pm.c				\
