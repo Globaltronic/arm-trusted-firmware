@@ -48,7 +48,6 @@ SECTIONS
     ro . : {
         __RO_START__ = .;
         KEEP(*head_data.o(.head_data*))
-        KEEP(*bl31_hash.o(.hash_data*))
         KEEP(*bl31_entrypoint.o(.text*))
         *(.text*)
         *(.rodata*)

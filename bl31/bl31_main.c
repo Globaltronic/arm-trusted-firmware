@@ -71,11 +71,8 @@ void bl31_lib_init(void)
  ******************************************************************************/
 void bl31_main(void)
 {
-	extern char bl31_hash_value[64];
-
 	NOTICE("BL3-1: %s\n", version_string);
 	NOTICE("BL3-1: %s\n", build_message);
-	NOTICE("BL3-1 commit: %s\n", bl31_hash_value);
 
 	/* Perform remaining generic architectural setup from EL3 */
 	bl31_arch_setup();
