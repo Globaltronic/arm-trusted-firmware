@@ -41,15 +41,13 @@
 #include <arisc.h>
 #include <mmio.h>
 
-#define ARM_NUM_CALLS 6
+#define ARM_NUM_CALLS 4
 
 #define ARM_SVC_CALL_COUNT	0x8000ff00
 #define ARM_SVC_UID		0x8000ff01
 //0x8000ff02 reserved
 #define ARM_SVC_VERSION		0x8000ff03
 #define ARM_SVC_RUNNSOS		0x8000ff04
-#define ARM_SVC_READ_SEC_REG    0x8000ff05
-#define ARM_SVC_WRITE_SEC_REG   0x8000ff06
 
 #define ARM_SVC_ARISC_STARTUP	 0x8000ff10
 #define ARM_SVC_ARISC_WAIT_READY 0x8000ff11
@@ -122,11 +120,6 @@ uint64_t arm_svc_smc_handler(uint32_t smc_fid,
 		SMC_RET2(handle, ARM_SVC_VERSION_MAJOR, ARM_SVC_VERSION_MINOR);
 	case ARM_SVC_RUNNSOS:
 		prepare_nonsec_os_entry((uint32_t)x1,(uint32_t)x2);
-		SMC_RET0(handle);
-	case ARM_SVC_READ_SEC_REG:
-		SMC_RET1(handle, mmio_read_32((uintptr_t)x1));
-	case ARM_SVC_WRITE_SEC_REG:
-		mmio_write_32((uintptr_t)x1,(uint32_t)x2);
 		SMC_RET0(handle);
 
 	//arise cmd begin
