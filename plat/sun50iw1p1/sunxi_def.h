@@ -61,8 +61,14 @@
 
 #define SUNXI_MAX_DRAM_SIZE           (2ull<<30)     /*2G*/
 
-//monitor area(atf+scp)
-#define SUNXI_TRUSTED_MONITOR_BASE	0x40000000
+/*
+ * This puts ATF into SRAM C. The first 32KB (@0x18000) are used by FEL to
+ * hold the FEL stack backups, so leave this free and start after that.
+ * On my board some memory later in SRAM C was unreliable, so having it
+ * compiled with DEBUG=1 showed weird errors. It should be checked if this
+ * just a faulty SoC I have, and if, how wide spread this bug is.
+ */
+#define SUNXI_TRUSTED_MONITOR_BASE	0x00020000	/* 32KB into SRAM C */
 #define SUNXI_TRUSTED_MONITOR_SIZE	(64 << 10)	/* 64 KByte */
 
 //sec os area
