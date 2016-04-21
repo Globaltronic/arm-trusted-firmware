@@ -28,38 +28,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 
-# Shared memory may be allocated at the top of Trusted SRAM (tsram) or at the
-# base of Trusted SRAM (tdram)
-SUNXI_SHARED_DATA_LOCATION	:=	tdram
-ifeq (${SUNXI_SHARED_DATA_LOCATION}, tsram)
-  SUNXI_SHARED_DATA_LOCATION_ID := SUNXI_IN_TRUSTED_SRAM
-else ifeq (${SUNXI_SHARED_DATA_LOCATION}, tdram)
-  SUNXI_SHARED_DATA_LOCATION_ID := SUNXI_IN_TRUSTED_DRAM
-else
-  $(error "Unsupported SUNXI_SHARED_DATA_LOCATION value")
-endif
-
-# On FVP, the TSP can execute either from Trusted SRAM or Trusted DRAM.
-# Trusted SRAM is the default.
-SUNXI_TSP_RAM_LOCATION	:=	tdram
-ifeq (${SUNXI_TSP_RAM_LOCATION}, tsram)
-  SUNXI_TSP_RAM_LOCATION_ID := SUNXI_IN_TRUSTED_SRAM
-else ifeq (${SUNXI_TSP_RAM_LOCATION}, tdram)
-  SUNXI_TSP_RAM_LOCATION_ID := SUNXI_IN_TRUSTED_DRAM
-else
-  $(error "Unsupported SUNXI_TSP_RAM_LOCATION value")
-endif
-
-ifeq (${SUNXI_SHARED_DATA_LOCATION}, tsram)
-  ifeq (${SUNXI_TSP_RAM_LOCATION}, tdram)
-    $(error Shared data in Trusted SRAM and TSP in Trusted DRAM is not supported)
-  endif
-endif
-
-# Process flags
-$(eval $(call add_define,SUNXI_SHARED_DATA_LOCATION_ID))
-$(eval $(call add_define,SUNXI_TSP_RAM_LOCATION_ID))
-
 PLAT_INCLUDES		:=	-Iplat/sun50iw1p1/include/
 
 
