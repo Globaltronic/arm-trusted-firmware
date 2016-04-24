@@ -56,8 +56,9 @@ plat_config_t plat_config;
  */
 const mmap_region_t sunxi_mmap[] = {
 
-	//1G
-	{ 0,				0,				DRAM1_BASE,			MT_DEVICE | MT_RW | MT_SECURE },
+	// MMI/O region used by peripherals from 0x100.0000 to 0x200.0000
+	{ 0x1000000,			0x1000000,
+		0x1000000,			MT_DEVICE | MT_RW | MT_SECURE },
 	//2G
 	{ DRAM1_BASE,			DRAM1_BASE,			SUNXI_MAX_DRAM_SIZE,		MT_MEMORY | MT_RW | MT_NS},
 	//TRUSTED dram for secure os and shared memory
