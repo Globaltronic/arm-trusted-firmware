@@ -95,7 +95,7 @@
 #define MEMRES_SIZE             0x100000 //1M
 
 /* Load address of BL33 in the sunxi */
-#define NS_IMAGE_OFFSET		(DRAM1_BASE + 0xA000000) /* DRAM + 128MB */
+#define NS_IMAGE_OFFSET		(DRAM1_BASE + 0xA000000) /* DRAM + 160MB */
 
 /* Special value used to verify platform parameters from BL2 to BL3-1 */
 #define SUNXI_BL31_PLAT_PARAM_VAL	0x12345678 //0x0f1e2d3c4b5a6978ULL
