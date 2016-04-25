@@ -57,14 +57,6 @@ func bl31_entrypoint
 
 code_start:
 #if !RESET_TO_BL31
-	/*
-	*AA32 warmreset to AA64, the high 32bit in reg R0,R1 is unpredictable
-	*/
-	/*mov	x20, x0*/
-	/*mov	x21, x1*/
-
-	mov	x20, 0
-	mov	x21, 0
 	mov	w20, w0
 	mov	w21, w1
 #else
