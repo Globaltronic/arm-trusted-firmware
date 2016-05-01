@@ -62,13 +62,15 @@
 #define SUNXI_MAX_DRAM_SIZE           (2ull<<30)     /*2G*/
 
 /*
- * This puts ATF into SRAM C. The first 32KB (@0x18000) are used by FEL to
- * hold the FEL stack backups, so leave this free and start after that.
- * On my board some memory later in SRAM C was unreliable, so having it
- * compiled with DEBUG=1 showed weird errors. It should be checked if this
- * just a faulty SoC I have, and if, how wide spread this bug is.
+ * This puts ATF into SRAM A2. The first 16KB (@0x40000) are used by the
+ * OpenRISC exception vectors and are actually only sparsely implemented
+ * to match the OpenRISC vector table layout (one word every 256 Bytes).
+ * According to the manual SRAM A2 should be hardwired to be secure only,
+ * but this is apparently not true.
+ * This SRAM is tightly coupled to the OpenRISC controller, so it's not the
+ * ideal place to put ATF into, but worked better than SRAM C for me.
  */
-#define SUNXI_TRUSTED_MONITOR_BASE	0x00020000	/* 32KB into SRAM C */
+#define SUNXI_TRUSTED_MONITOR_BASE	0x00044000	/* 16KB into SRAM A2 */
 #define SUNXI_TRUSTED_MONITOR_SIZE	(64 << 10)	/* 64 KByte */
 
 //sec os area
