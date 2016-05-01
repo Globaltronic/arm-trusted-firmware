@@ -126,9 +126,6 @@ uint32_t sunxi_get_spsr_for_bl33_entry(int aarch)
 
 	switch (aarch) {
 	case 32:
-		/* HACK: keep entering U-Boot in SVC for now */
-		mode = MODE32_svc;
-
 		spsr = SPSR_MODE32(mode, SPSR_T_ARM, SPSR_E_LITTLE,
 				   DISABLE_ALL_EXCEPTIONS);
 		break;
