@@ -41,12 +41,21 @@
 	 * -----------------------------------------------------
 	 */
 func bl31_entrypoint
+	b	code_start
+	nop			/* align to 8 bytes */
+	.byte	0x05, 0x00, 0x00, 0xe0, 0x00, 0x04, 0x02, 0xa8
+	/*	l.xor r0, r0, r0        l.ori r1, r0, 0xc0	*/
+	.byte	0x00, 0x80, 0x00, 0xc1, 0x00, 0x00, 0x00, 0x15
+	/*	l.mtspr r0, r1, 0x4000	l.nop */
+
 	/* ---------------------------------------------------------------
 	 * Preceding bootloader has populated x0 with a pointer to a
 	 * 'bl31_params' structure & x1 with a pointer to platform
 	 * specific structure
 	 * ---------------------------------------------------------------
 	 */
+
+code_start:
 #if !RESET_TO_BL31
 	/*
 	*AA32 warmreset to AA64, the high 32bit in reg R0,R1 is unpredictable
