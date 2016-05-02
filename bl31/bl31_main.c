@@ -153,9 +153,8 @@ void bl31_prepare_next_image_entry(void)
 
 	INFO("BL3-1: Preparing for EL3 exit to %s world\n",
 		(image_type == SECURE) ? "secure" : "normal");
-	INFO("BL3-1: Next image address = 0x%llx\n",
-		(unsigned long long) next_image_info->pc);
-	INFO("BL3-1: Next image spsr = 0x%x\n", next_image_info->spsr);
+	INFO("BL3-1: Next image address: 0x%lx, SPSR: 0x%x\n",
+		next_image_info->pc, next_image_info->spsr);
 	cm_init_context(read_mpidr_el1(), next_image_info);
 	cm_prepare_el3_exit(image_type);
 }

@@ -41,6 +41,8 @@
 #include "sunxi_def.h"
 #include "sunxi_private.h"
 
+#include <debug.h>
+
 /*******************************************************************************
  * Declarations of linker defined symbols which will help us find the layout
  * of trusted SRAM
@@ -118,6 +120,14 @@ entry_point_info_t *bl31_plat_get_next_image_ep_info(uint32_t type)
 #endif
 }
 
+static unsigned long get_pc(void)
+{
+	unsigned long pc;
+
+	__asm__ volatile ("adr %0, .\n" : "=r" (pc));
+	return pc;
+}
+
 /*******************************************************************************
  * Perform any BL31 specific platform actions. Here is an opportunity to copy
  * parameters passed by the calling EL (S-EL1 in BL2 & S-EL3 in BL1) before they
@@ -132,8 +142,22 @@ entry_point_info_t *bl31_plat_get_next_image_ep_info(uint32_t type)
 void bl31_early_platform_setup(bl31_params_t *from_bl2,
 				void *plat_params_from_bl2)
 {
+	unsigned long load_addr;
+	const char *mem_name = "unknown memory region";
+
 	/* Initialize the console to provide early debug support */
 	console_init(SUNXI_UART0_BASE, UART0_CLK_IN_HZ, UART0_BAUDRATE);
+	load_addr = get_pc() & ~0xfff;
+	if (load_addr >= 0x44000 && load_addr < 0x54000) {
+		mem_name = "SRAM A2";
+	} else if (load_addr >= 0x10000 && load_addr < 0x18000) {
+		mem_name = "SRAM A1";
+	} else if (load_addr >= 0x18000 && load_addr < 0x40000) {
+		mem_name = "SRAM C";
+	} else if (load_addr >= 0x40000000)
+		mem_name = "DRAM";
+
+	NOTICE("BL3-1: Running in %s (@0x%lx)\n", mem_name, load_addr);
 
 #if 0
 #if RESET_TO_BL31
