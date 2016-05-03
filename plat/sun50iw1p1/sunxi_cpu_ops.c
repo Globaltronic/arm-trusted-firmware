@@ -91,10 +91,8 @@
  int  sun50i_power_switch_set(unsigned int cluster, unsigned int cpu, bool enable)
  {
 	 if (enable) {
-		 if (0x00 == readl(sun50i_prcm_base + SUNXI_CPU_PWR_CLAMP(cluster, cpu))) {
-			 NOTICE("%s: power switch enable already\n", __func__);
+		 if (0x00 == readl(sun50i_prcm_base + SUNXI_CPU_PWR_CLAMP(cluster, cpu)))
 			 return 0;
-		 }
  
 		 /* de-active cpu power clamp */
 		 writel(0xFE, sun50i_prcm_base + SUNXI_CPU_PWR_CLAMP(cluster, cpu));
@@ -114,10 +112,8 @@
  
 		 while (0x00 != readl(sun50i_prcm_base + SUNXI_CPU_PWR_CLAMP(cluster, cpu)));
 	 } else {
-		 if (0xFF == readl(sun50i_prcm_base + SUNXI_CPU_PWR_CLAMP(cluster, cpu))) {
-			 NOTICE("%s: power switch disable already\n", __func__);
+		 if (0xFF == readl(sun50i_prcm_base + SUNXI_CPU_PWR_CLAMP(cluster, cpu)))
 			 return 0;
-		 }
  
 		 writel(0xFF, sun50i_prcm_base + SUNXI_CPU_PWR_CLAMP(cluster, cpu));
 		 udelay(30);
@@ -173,7 +169,6 @@
 	 writel(value, sun50i_cpucfg_base + SUNXI_DBG_REG0);
 	 udelay(10);
 	 bakery_lock_get(&plat_console_lock);
-	 INFO("sun50i power-up cluster-%d cpu-%d ok\n", cluster, cpu);
 	 bakery_lock_release(&plat_console_lock);
  }
 
@@ -202,7 +197,6 @@ void sun50i_cpu_power_down(unsigned int cluster, unsigned int cpu)
 	/* step10: Remove power from th e PDCPU power domain */
 	sun50i_power_switch_set(cluster, cpu, 0);
 	bakery_lock_get(&plat_console_lock);
-	INFO("sun50i power-down cluster-%d cpu-%d ok.\n", cluster, cpu);
 	bakery_lock_release(&plat_console_lock);
 
 }
