@@ -256,15 +256,8 @@ static int32_t sunxi_affinst_suspend_finish(uint64_t mpidr,
  ******************************************************************************/
 static void __dead2 sunxi_system_off(void)
 {
-	uint32_t response;
+	ERROR("PSCI system shutdown not implemented, halting the system.\n");
 
-	/* Send the power down request to the SCP */
-	response = arisc_system_op(arisc_system_shutdown);
-
-	if (response != SCP_OK) {
-		ERROR("Sunxi System Off: SCP error %u.\n", response);
-		panic();
-	}
 	wfi();
 	ERROR("Sunxi System Off: operation not handled.\n");
 	panic();
