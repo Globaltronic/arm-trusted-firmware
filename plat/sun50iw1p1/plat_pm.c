@@ -40,7 +40,6 @@
 #include <bakery_lock.h>
 #include "sunxi_def.h"
 #include "sunxi_private.h"
-#include "scpi.h"
 #include "sunxi_cpu_ops.h"
 #include <arisc.h>
 #include <cci400.h>
@@ -273,15 +272,10 @@ static void __dead2 sunxi_system_off(void)
 
 static void __dead2 sunxi_system_reset(void)
 {
-	uint32_t response;
+	mmio_write_32(0x01c20cb4, 1);
+	mmio_write_32(0x01c20cb8, 1);
+	mmio_write_32(0x01c20cb0, (0xa57 << 1) | 0x01);
 
-	/* Send the system reset request to the SCP */
-	response = arisc_system_op(scpi_system_reboot);
-
-	if (response != SCP_OK) {
-		ERROR("Sunxi System Reset: SCP error %u.\n", response);
-		panic();
-	}
 	wfi();
 	ERROR("Sunxi System Reset: operation not handled.\n");
 	panic();
