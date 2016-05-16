@@ -38,7 +38,9 @@
 
 #define SPC_BASE	0x1c23400ULL
 
-#define SPC_DECPORT_SET_REG(p) (SPC_BASE + ((p) * 0x10) + 0x8)
+#define SPC_DECPORT_STA_REG(p) (SPC_BASE + ((p) * 0x0c) + 0x4)
+#define SPC_DECPORT_SET_REG(p) (SPC_BASE + ((p) * 0x0c) + 0x8)
+#define SPC_DECPORT_CLR_REG(p) (SPC_BASE + ((p) * 0x0c) + 0xc)
 
 /*
  * For the moment we assume that all security programming is done by the
@@ -52,9 +54,16 @@ void sunxi_security_setup(void)
 
 	NOTICE("Configuring SPC Controller\n");
 
+	/* set all devices to non-secure */
 	for (i = 0; i < 6; i++)
 		mmio_write_32(SPC_DECPORT_SET_REG(i), 0xff);
+
+	/* switch RSB to secure */
+	mmio_write_32(SPC_DECPORT_CLR_REG(3), 0x08);
 	
+	/* switch SRAM A1 to secure */
+	mmio_write_32(SPC_DECPORT_CLR_REG(1), 0x08);
+
 	/* set CCMU mbus_sec, bus_sec, pll_sec to non-secure */
 	mmio_write_32(0x01c20000+0x2f0, 0x7);
 
