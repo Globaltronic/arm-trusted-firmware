@@ -178,6 +178,7 @@ void bl31_early_platform_setup(bl31_params_t *from_bl2,
 	 * present.
 	 */
 	sunxi_security_setup();
+
 	/*
 	 * Tell BL31 where the non-trusted software image
 	 * is located and the entry state information
@@ -202,6 +203,8 @@ void bl31_platform_setup(void)
 
 	/* Detect if this SoC is a multi-cluster one. */
 	plat_setup_topology();
+
+	sunxi_pmic_setup();
 }
 
 /*******************************************************************************

@@ -65,6 +65,11 @@ void sunxi_io_setup(void);
 /* Declarations for sunxi_security.c */
 void sunxi_security_setup(void);
 
+/* Declarations for sunxi_power.c */
+int sunxi_pmic_setup(void);
+int sunxi_pmic_read(uint8_t address);
+int sunxi_pmic_write(uint8_t address, uint8_t value);
+
 /* Gets the SPSR for BL33 entry */
 uint32_t sunxi_get_spsr_for_bl33_entry(int aarch);
 
