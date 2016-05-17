@@ -254,10 +254,10 @@ static int32_t sunxi_affinst_suspend_finish(uint64_t mpidr,
  ******************************************************************************/
 static void __dead2 sunxi_system_off(void)
 {
-	ERROR("PSCI system shutdown not implemented, halting the system.\n");
+	sunxi_pmic_write(0x32, sunxi_pmic_read(0x32) | 0x80);
+	ERROR("PSCI system shutdown: still alive ...\n");
 
 	wfi();
-	ERROR("Sunxi System Off: operation not handled.\n");
 	panic();
 }
 
