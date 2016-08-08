@@ -56,6 +56,9 @@ plat_config_t plat_config;
  */
 const mmap_region_t sunxi_mmap[] = {
 
+	// SRAM regions
+	{ 0x0010000,			0x0010000,
+		0x0030000,			MT_DEVICE | MT_RW | MT_NS },
 	// MMI/O region used by peripherals from 0x100.0000 to 0x200.0000
 	{ 0x1000000,			0x1000000,
 		0x1000000,			MT_DEVICE | MT_RW | MT_SECURE },
