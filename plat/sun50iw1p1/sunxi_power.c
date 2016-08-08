@@ -212,7 +212,7 @@ static int pmic_init(uint16_t hw_addr, uint8_t rt_addr)
 	return 0;
 }
 
-/* Setup the PMIC: DCDC1 to 3.3V, enable DC1SW */
+/* Setup the PMIC: DCDC1 to 3.3V, enable DC1SW and DLDO4 */
 static int pmic_setup(void)
 {
 	int ret;
@@ -236,17 +236,17 @@ static int pmic_setup(void)
 	}
 
 	ret = sunxi_pmic_read(0x12);
-	if (ret != 0x01 && ret != 0x81) {
+	if ((ret & 0x3f) != 0x01) {
 		NOTICE("PMIC: Output power control 2 is an unexpected 0x%x\n",
 		       ret);
 		return -3;
 	}
 
-	if (ret != 0x81) {
-		/* Enable DC1SW to power PHY */
-		ret = sunxi_pmic_write(0x12, ret | 0x80);
+	if ((ret & 0xc1) != 0xc1) {
+		/* Enable DC1SW to power PHY and DLDO4 for WiFi */
+		ret = sunxi_pmic_write(0x12, ret | 0xc0);
 		if (ret < 0) {
-			NOTICE("PMIC: error %d enabling DC1SW\n", ret);
+			NOTICE("PMIC: error %d enabling DC1SW/DLDO4\n", ret);
 			return -4;
 		}
 	}
