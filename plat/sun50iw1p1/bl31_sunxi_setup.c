@@ -228,6 +228,7 @@ void bl31_platform_setup(void)
 	/* Detect if this SoC is a multi-cluster one. */
 	plat_setup_topology();
 
+	sunxi_setup_clocks();
 	sunxi_pmic_setup();
 }
 

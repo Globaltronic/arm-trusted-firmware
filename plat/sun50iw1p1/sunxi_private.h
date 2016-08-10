@@ -70,6 +70,9 @@ int sunxi_pmic_setup(void);
 int sunxi_pmic_read(uint8_t address);
 int sunxi_pmic_write(uint8_t address, uint8_t value);
 
+void udelay(unsigned int delay);
+int sunxi_setup_clocks(void);
+
 /* Gets the SPSR for BL33 entry */
 uint32_t sunxi_get_spsr_for_bl33_entry(int aarch);
 
