@@ -61,18 +61,18 @@
  static unsigned int sun50i_prcm_base = SUN50I_PRCM_PBASE;
  static unsigned int sun50i_r_cpucfg_base = SUN50I_RCPUCFG_PBASE;
  extern bakery_lock_t plat_console_lock;
- void udelay(unsigned int delay)
- {
-	 unsigned int i, j;
 
+void udelay(unsigned int delay)
+{
 	if (!delay)
 		return;
 
-	 for (i=0; i<1000*delay; i++)
-	 {
-		 j+=i;
-	 }
- }
+	__asm__ volatile (
+		"1:\tsubs %0, %0, #1\n"
+		"\tb.ne	1b"
+		:: "r" (delay * 1000UL)
+	);
+}
 
 #ifdef SUNXI_CPUOPS_REAL_DELAY
 #define CPU_DELAY_SHORT		10
