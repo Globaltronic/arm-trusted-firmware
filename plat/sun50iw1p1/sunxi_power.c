@@ -251,6 +251,8 @@ static int pmic_setup(void)
 		}
 	}
 
+	sunxi_pmic_write(0x24, 0xb3);	/* DCDC5 = DDR RAM voltage = 1.5V */
+
 	return 0;
 }
 
