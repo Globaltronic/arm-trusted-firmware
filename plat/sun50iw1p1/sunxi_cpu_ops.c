@@ -64,12 +64,25 @@
  void udelay(unsigned int delay)
  {
 	 unsigned int i, j;
- 
+
+	if (!delay)
+		return;
+
 	 for (i=0; i<1000*delay; i++)
 	 {
 		 j+=i;
 	 }
  }
+
+#ifdef SUNXI_CPUOPS_REAL_DELAY
+#define CPU_DELAY_SHORT		10
+#define CPU_DELAY_MEDIUM	20
+#define CPU_DELAY_LONG		30
+#else
+#define CPU_DELAY_SHORT		0
+#define CPU_DELAY_MEDIUM	0
+#define CPU_DELAY_LONG		0
+#endif
  
  void sun50i_set_secondary_entry(unsigned long entry, unsigned int cpu)
  {
@@ -96,19 +109,19 @@
  
 		 /* de-active cpu power clamp */
 		 writel(0xFE, sun50i_prcm_base + SUNXI_CPU_PWR_CLAMP(cluster, cpu));
-		 udelay(20);
+		 udelay(CPU_DELAY_MEDIUM);
  
 		 writel(0xF8, sun50i_prcm_base + SUNXI_CPU_PWR_CLAMP(cluster, cpu));
-		 udelay(10);
+		 udelay(CPU_DELAY_SHORT);
  
 		 writel(0xE0, sun50i_prcm_base + SUNXI_CPU_PWR_CLAMP(cluster, cpu));
-		 udelay(10);
+		 udelay(CPU_DELAY_SHORT);
  
 		 writel(0x80, sun50i_prcm_base + SUNXI_CPU_PWR_CLAMP(cluster, cpu));
-		 udelay(10);
+		 udelay(CPU_DELAY_SHORT);
  
 		 writel(0x00, sun50i_prcm_base + SUNXI_CPU_PWR_CLAMP(cluster, cpu));
-		 udelay(20);
+		 udelay(CPU_DELAY_MEDIUM);
  
 		 while (0x00 != readl(sun50i_prcm_base + SUNXI_CPU_PWR_CLAMP(cluster, cpu)));
 	 } else {
@@ -116,7 +129,7 @@
 			 return 0;
  
 		 writel(0xFF, sun50i_prcm_base + SUNXI_CPU_PWR_CLAMP(cluster, cpu));
-		 udelay(30);
+		 udelay(CPU_DELAY_LONG);
  
 		 while (0xFF != readl(sun50i_prcm_base + SUNXI_CPU_PWR_CLAMP(cluster, cpu)));
 	 }
@@ -131,13 +144,13 @@
 	 value	= readl(sun50i_cpucfg_base + SUNXI_CPU_RST_CTRL(cluster));
 	 value &= (~(1<<cpu));
 	 writel(value, sun50i_cpucfg_base + SUNXI_CPU_RST_CTRL(cluster));
-	 udelay(10);
+	 udelay(CPU_DELAY_SHORT);
  
 	 /* Assert cpu power-on reset */
 	 value	= readl(sun50i_r_cpucfg_base + SUNXI_CLUSTER_PWRON_RESET(cluster));
 	 value &= (~(1<<cpu));
 	 writel(value, sun50i_r_cpucfg_base + SUNXI_CLUSTER_PWRON_RESET(cluster));
-	 udelay(10);
+	 udelay(CPU_DELAY_SHORT);
  
 	 /* set AA32nAA64 to AA64 */
 	 sun50i_set_AA32nAA64(cluster, cpu, 1);
@@ -149,25 +162,25 @@
 	 value = readl(sun50i_prcm_base + SUNXI_CLUSTER_PWROFF_GATING(cluster));
 	 value &= (~(0x1<<cpu));
 	 writel(value, sun50i_prcm_base + SUNXI_CLUSTER_PWROFF_GATING(cluster));
-	 udelay(20);
+	 udelay(CPU_DELAY_MEDIUM);
  
 	 /* Deassert cpu power-on reset */
 	 value	= readl(sun50i_r_cpucfg_base + SUNXI_CLUSTER_PWRON_RESET(cluster));
 	 value |= ((1<<cpu));
 	 writel(value, sun50i_r_cpucfg_base + SUNXI_CLUSTER_PWRON_RESET(cluster));
-	 udelay(10);
+	 udelay(CPU_DELAY_SHORT);
  
 	 /* Deassert core reset */
 	 value	= readl(sun50i_cpucfg_base + SUNXI_CPU_RST_CTRL(cluster));
 	 value |= (1<<cpu);
 	 writel(value, sun50i_cpucfg_base + SUNXI_CPU_RST_CTRL(cluster));
-	 udelay(10);
+	 udelay(CPU_DELAY_SHORT);
  
 	 /* Assert DBGPWRDUP HIGH */
 	 value = readl(sun50i_cpucfg_base + SUNXI_DBG_REG0);
 	 value |= (1<<cpu);
 	 writel(value, sun50i_cpucfg_base + SUNXI_DBG_REG0);
-	 udelay(10);
+	 udelay(CPU_DELAY_SHORT);
 	 bakery_lock_get(&plat_console_lock);
 	 bakery_lock_release(&plat_console_lock);
  }
@@ -180,19 +193,19 @@ void sun50i_cpu_power_down(unsigned int cluster, unsigned int cpu)
 	value = readl(sun50i_cpucfg_base + SUNXI_DBG_REG0);
 	value &= (~(1<<cpu));
 	writel(value, sun50i_cpucfg_base + SUNXI_DBG_REG0);
-	udelay(10);
+	udelay(CPU_DELAY_SHORT);
 
 	/* step8: Activate the core output clamps */
 	value = readl(sun50i_prcm_base + SUNXI_CLUSTER_PWROFF_GATING(cluster));
 	value |= (1 << cpu);
 	writel(value, sun50i_prcm_base + SUNXI_CLUSTER_PWROFF_GATING(cluster));
-	udelay(20);
+	udelay(CPU_DELAY_MEDIUM);
 
 	/* step9: Assert nCPUPORESET LOW */
 	value	= readl(sun50i_cpucfg_base + SUNXI_CPU_RST_CTRL(cluster));
 	value &= (~(1<<cpu));
 	writel(value, sun50i_cpucfg_base + SUNXI_CPU_RST_CTRL(cluster));
-	udelay(10);
+	udelay(CPU_DELAY_SHORT);
 
 	/* step10: Remove power from th e PDCPU power domain */
 	sun50i_power_switch_set(cluster, cpu, 0);
