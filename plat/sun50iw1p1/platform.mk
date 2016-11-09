@@ -33,9 +33,7 @@ PLAT_INCLUDES		:=	-Iplat/sun50iw1p1/include/
 
 PLAT_BL_COMMON_SOURCES	:= lib/aarch64/xlat_tables.c			\
 				plat/common/aarch64/plat_common.c	\
-				plat/sun50iw1p1/drivers/uart/uart.c	\
-				plat/sun50iw1p1/drivers/gpio/gpio.c		
-
+				plat/sun50iw1p1/drivers/uart/uart.c
 
 
 BL31_SOURCES		+=	drivers/arm/gic/arm_gic.c		\
