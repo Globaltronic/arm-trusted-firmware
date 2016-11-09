@@ -137,3 +137,16 @@ uint32_t sunxi_get_spsr_for_bl33_entry(int aarch)
 
 	return spsr;
 }
+
+#define SRAM_VER_REG 0x01c00024
+
+uint16_t sunxi_get_socid(void)
+{
+	uint32_t reg;
+
+	reg = mmio_read_32(SRAM_VER_REG);
+	mmio_write_32(SRAM_VER_REG, reg | (1 << 15));
+	reg = mmio_read_32(SRAM_VER_REG);
+	mmio_write_32(0x01c00024, reg & ~(1 << 15));
+	return reg >> 16;
+}

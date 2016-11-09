@@ -56,6 +56,8 @@ void sunxi_configure_mmu_el3(unsigned long total_base,
 			   unsigned long);
 int sunxi_config_setup(void);
 
+uint16_t sunxi_get_socid(void);
+
 /* Declarations for sunxi_topology.c */
 int plat_setup_topology(void);
 

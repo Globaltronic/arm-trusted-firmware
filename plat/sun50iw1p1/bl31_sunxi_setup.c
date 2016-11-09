@@ -144,6 +144,8 @@ void bl31_early_platform_setup(bl31_params_t *from_bl2,
 {
 	unsigned long load_addr;
 	const char *mem_name = "unknown memory region";
+	const char *soc_name = "unknown SoC";
+	uint16_t soc_id;
 
 	/* Initialize the console to provide early debug support */
 	console_init(SUNXI_UART0_BASE, UART0_CLK_IN_HZ, UART0_BAUDRATE);
@@ -157,7 +159,16 @@ void bl31_early_platform_setup(bl31_params_t *from_bl2,
 	} else if (load_addr >= 0x40000000)
 		mem_name = "DRAM";
 
-	NOTICE("BL3-1: Running in %s (@0x%lx)\n", mem_name, load_addr);
+	soc_id = sunxi_get_socid();
+
+	switch (soc_id) {
+	case 0x1689:
+		soc_name = "A64/H64";
+		break;
+	}
+
+	NOTICE("BL3-1: Running on %s (%x) in %s (@0x%lx)\n",
+	       soc_name, soc_id, mem_name, load_addr);
 
 #if 0
 #if RESET_TO_BL31
