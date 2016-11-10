@@ -165,6 +165,9 @@ void bl31_early_platform_setup(bl31_params_t *from_bl2,
 	case 0x1689:
 		soc_name = "A64/H64";
 		break;
+	case 0x1718:
+		soc_name = "H5";
+		break;
 	}
 
 	NOTICE("BL3-1: Running on %s (%x) in %s (@0x%lx)\n",
@@ -240,7 +243,14 @@ void bl31_platform_setup(void)
 	plat_setup_topology();
 
 	sunxi_setup_clocks();
-	sunxi_pmic_setup();
+
+	switch (sunxi_get_socid()) {
+	case 0x1689:
+		sunxi_pmic_setup();
+		break;
+	case 0x1718:
+		break;
+	}
 }
 
 /*******************************************************************************
