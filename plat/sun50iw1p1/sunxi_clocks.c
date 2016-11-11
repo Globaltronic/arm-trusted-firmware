@@ -33,7 +33,7 @@
 #include <ccmu.h>
 #include "sunxi_private.h"
 
-int sunxi_setup_clocks(void)
+int sunxi_setup_clocks(uint16_t socid)
 {
 	uint32_t reg;
 
@@ -44,6 +44,8 @@ int sunxi_setup_clocks(void)
 
 	/* Check initial CPU frequency: */
 	reg = mmio_read_32(CCMU_PLL_CPUX_CTRL_REG);
+
+	if (socid == 0x1689) {
 	if ((reg & 0x0fffffff) != 0x1010) {		/* if not at 816 MHz: */
 		/* switch CPU to 24 MHz source for changing PLL1 */
 		mmio_write_32(CCMU_CPUX_AXI_CFG_REG,  0x00010000);
@@ -57,6 +59,10 @@ int sunxi_setup_clocks(void)
 	/* switch CPU to PLL1 source, AXI = CPU/3, APB = CPU/4 */
 	mmio_write_32(CCMU_CPUX_AXI_CFG_REG,  0x00020302);
 	udelay(1);
+
+	} else {
+		NOTICE("PLL_CPUX: %x\n", reg);
+	}
 
 	/* AHB1 = PERIPH0 / (3 * 1) = 200MHz, APB1 = AHB1 / 2 */
 	mmio_write_32(CCMU_AHB1_APB1_CFG_REG, 0x00003180);

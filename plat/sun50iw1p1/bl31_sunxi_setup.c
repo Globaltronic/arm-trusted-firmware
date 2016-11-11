@@ -235,16 +235,20 @@ void bl31_early_platform_setup(bl31_params_t *from_bl2,
  ******************************************************************************/
 void bl31_platform_setup(void)
 {
+	uint16_t socid;
+
 	/* Initialize the gic cpu and distributor interfaces */
 	arm_gic_init(GICC_BASE, GICD_BASE, 0, NULL, 0);
 	arm_gic_setup();
 
+	socid = sunxi_get_socid();
+
 	/* Detect if this SoC is a multi-cluster one. */
 	plat_setup_topology();
 
-	sunxi_setup_clocks();
+	sunxi_setup_clocks(socid);
 
-	switch (sunxi_get_socid()) {
+	switch (socid) {
 	case 0x1689:
 		sunxi_pmic_setup();
 		break;
