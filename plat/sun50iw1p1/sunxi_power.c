@@ -270,7 +270,7 @@ static int pmic_setup(const char *dt_name)
 		ret = sunxi_pmic_read(0x13);
 		sunxi_pmic_write(0x13, ret | 0x4);
 
-		NOTICE("PMIC: enabled Pinebook display\n");
+		INFO("PMIC: enabled Pinebook display\n");
 	}
  
 	sunxi_pmic_write(0x15, 0x1a);	/* DLDO1 = VCC3V3_HDMI voltage = 3.3V */
@@ -285,7 +285,7 @@ int sunxi_pmic_setup(const char *dt_name)
 {
 	int ret;
 
-	NOTICE("Configuring AXP PMIC\n");
+	INFO("Configuring AXP PMIC\n");
 
 	ret = init_rsb();
 	if (ret && ret != -EEXIST) {
@@ -303,7 +303,7 @@ int sunxi_pmic_setup(const char *dt_name)
 
 	ret = pmic_setup(dt_name);
 	if (!ret)
-		NOTICE("PMIC: setup successful\n");
+		INFO("PMIC: setup successful\n");
 	else
 		ERROR("PMIC: setup failed: %d\n", ret);
 
