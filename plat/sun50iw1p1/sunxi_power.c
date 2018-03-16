@@ -242,16 +242,23 @@ static int pmic_setup(const char *dt_name)
 	 * On the Pine64 the AXP is wired wrongly: to reset DCDC5 to 1.24V.
 	 * However the DDR3L chips require 1.36V instead. Fix this up. Other
 	 * boards hopefully do the right thing here and don't require any
-	 * changes. This should be further confined once we are able to
-	 * reliably detect a Pine64 board.
+	 * changes.
 	 */
+	ret = sunxi_pmic_read(0x24) & 0x7f;	/* read DCDC5 register */
 	if (!strcmp(dt_name, "sun50i-a64-pine64-plus")) {
-		ret = sunxi_pmic_read(0x24);	/* read DCDC5 register */
-		if ((ret & 0x7f) == 0x26) {	/* check for 1.24V value */
+		if (ret == 0x26) {	/* check for 1.24V value */
 			NOTICE("PMIC: fixing DRAM voltage from 1.24V to 1.36V\n");
 			sunxi_pmic_write(0x24, 0x2c);
+			ret = 0x2c;
 		}
 	}
+	/* reg 24h: DCDC5: 0.80-1.12V: 10mv/step, 1.14-1.84V: 20mv/step */
+	if (ret > 0x20)
+		ret = ((ret - 0x20) * 2) + 112;
+	else
+		ret = ret + 80;
+	INFO("PMIC: DRAM voltage: %u.%s%uV\n", ret / 100,
+	     (ret % 100) > 10 ? "" : "0", ret % 100);
 
 	/* Enable the LCD power planes to get the display up early. */
 	if (!strcmp(dt_name, "sun50i-a64-pinebook")) {
