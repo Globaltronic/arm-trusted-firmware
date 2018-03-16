@@ -216,18 +216,9 @@ static int pmic_init(uint16_t hw_addr, uint8_t rt_addr)
 /* Setup the PMIC: DCDC1 to 3.3V, enable DC1SW and DLDO4 */
 static int pmic_setup(const char *dt_name)
 {
-	int ret;
+	unsigned int ret;
 
-	ret = sunxi_pmic_read(0x20);
-	if (ret != 0x0e && ret != 0x11) {
-		int voltage = (ret & 0x1f) * 10 + 16;
-
-		NOTICE("PMIC: DCDC1 voltage is an unexpected %d.%dV\n",
-		       voltage / 10, voltage % 10);
-		return -1;
-	}
-
-	if (ret != 0x11) {
+	if (sunxi_pmic_read(0x20) != 0x11) {
 		/* Set DCDC1 voltage to 3.3 Volts */
 		ret = sunxi_pmic_write(0x20, 0x11);
 		if (ret < 0) {
@@ -236,18 +227,13 @@ static int pmic_setup(const char *dt_name)
 		}
 	}
 
+	/* Enable DC1SW to power PHY, DLDO4 for WiFi and DLDO1 for HDMI */
 	ret = sunxi_pmic_read(0x12);
-	if ((ret & 0x37) != 0x01) {
-		NOTICE("PMIC: Output power control 2 is an unexpected 0x%x\n",
-		       ret);
-		return -3;
-	}
-
-	if ((ret & 0xc9) != 0xc9) {
-		/* Enable DC1SW to power PHY, DLDO4 for WiFi and DLDO1 for HDMI */
+	if ((ret & 0xc8) != 0xc8) {
 		ret = sunxi_pmic_write(0x12, ret | 0xc8);
 		if (ret < 0) {
-			NOTICE("PMIC: error %d enabling DC1SW/DLDO4/DLDO1\n", ret);
+			NOTICE("PMIC: error %d enabling DC1SW/DLDO4/DLDO1\n",
+			       ret);
 			return -4;
 		}
 	}
